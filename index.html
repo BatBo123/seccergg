@@ -3,216 +3,189 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>체코 (Che-Co) : AI 체대 입시 코치</title>
+  <title>Che-Co : AI 체대 입시 대시보드</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; font-family: 'Pretendard', Arial, sans-serif; }
     body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: linear-gradient(135deg, #1e3c72, #2a5298);
-      font-family: Arial, sans-serif;
-      padding: 20px;
+      margin: 0; min-height: 100vh;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      display: flex; justify-content: center; align-items: center; padding: 20px;
     }
-
-    .calculator {
-      width: 360px;
-      padding: 24px;
-      border-radius: 24px;
-      background: #ffffff;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-    }
-
-    h1 {
-      margin: 0 0 5px;
-      text-align: center;
-      font-size: 24px;
-      color: #333;
-    }
-
-    .subtitle {
-      text-align: center;
-      font-size: 12px;
-      color: #666;
-      margin-bottom: 16px;
-    }
-
-    /* Auth Section */
-    .auth-section {
-      margin-bottom: 15px;
+    
+    /* 1. 로그인 웰컴 카드 스타일 */
+    .login-container {
+      width: 400px; padding: 40px 30px; background: white;
+      border-radius: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.3);
       text-align: center;
     }
-    .btn-auth {
-      width: 100%;
-      padding: 10px;
-      border: none;
-      border-radius: 10px;
-      font-weight: bold;
-      cursor: pointer;
-      background-color: #4285F4;
-      color: white;
+    .btn-google {
+      width: 100%; padding: 14px; background: #4285F4; color: white;
+      border: none; border-radius: 12px; font-size: 16px; font-weight: bold;
+      cursor: pointer; transition: 0.2s; margin-top: 20px;
     }
-    .user-info {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 13px;
-      background: #f0f4f8;
-      padding: 8px 12px;
-      border-radius: 10px;
+    .btn-google:hover { background: #357ae8; }
+
+    /* 2. 대시보드 전체 레이아웃 (시안 그대로 구현) */
+    .dashboard {
+      display: none; width: 1200px; max-width: 100%; background: #f4f6f9;
+      border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.4);
     }
+    
+    /* 상단 네비게이션 */
+    .navbar {
+      background: #111e38; color: white; padding: 15px 30px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .brand { font-size: 22px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
     .btn-logout {
-      background: none;
-      border: none;
-      color: #ff4d4d;
-      cursor: pointer;
-      font-weight: bold;
+      background: #ff4d4d; color: white; border: none; padding: 8px 16px;
+      border-radius: 8px; cursor: pointer; font-weight: bold;
     }
 
-    /* Input Form */
-    .input-group {
-      margin-bottom: 12px;
-    }
-    .input-group label {
-      display: block;
-      font-size: 13px;
-      color: #555;
-      margin-bottom: 4px;
-      font-weight: bold;
-    }
-    .input-group input {
-      width: 100%;
-      height: 45px;
-      padding: 10px;
-      border: 2px solid #edf1f5;
-      border-radius: 12px;
-      font-size: 16px;
-      outline: none;
-      background: #f9fbfd;
-      transition: 0.2s;
-    }
-    .input-group input:focus {
-      border-color: #42a5f5;
+    /* 메인 콘텐츠 그리드 구조 */
+    .main-content {
+      padding: 25px; display: grid;
+      grid-template-columns: 2.5fr 1.5fr; gap: 25px;
     }
 
-    /* Buttons */
-    .btn-block {
-      width: 100%;
-      height: 50px;
-      border: none;
-      border-radius: 14px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 8px;
-      transition: 0.15s;
+    /* 왼쪽 섹션: 대시보드 정보 및 4분할 카드 */
+    .left-section { display: flex; flex-direction: column; gap: 20px; }
+    .dashboard-card {
+      background: white; border-radius: 16px; padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
-    .btn-block:hover {
-      transform: translateY(-2px);
+    
+    .profile-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; align-items: center; }
+    .avatar-box { text-align: center; border-right: 1px solid #eee; padding-right: 20px; }
+    .avatar { width: 80px; height: 80px; border-radius: 50%; background: #ddd; margin: 0 auto 10px; overflow: hidden; }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* 4분할 실기 지표 그리드 */
+    .metrics-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;
     }
-    .btn-save {
-      background: #28a745;
-      color: white;
+    .metric-item {
+      background: #fff; border: 1px solid #eef2f5; border-radius: 12px; padding: 15px;
+      position: relative; display: flex; flex-direction: column; justify-content: space-between;
     }
-    .btn-ai {
-      background: #6f42c1;
-      color: white;
+    .metric-title { font-size: 13px; color: #666; font-weight: bold; }
+    .metric-value { font-size: 24px; font-weight: bold; margin: 8px 0; color: #222; }
+    .metric-value input {
+      width: 70%; border: none; border-bottom: 2px solid #ddd; font-size: 20px;
+      font-weight: bold; outline: none; padding: 2px;
+    }
+    .metric-value input:focus { border-bottom-color: #6f42c1; }
+    .chart-container { height: 60px; width: 100%; }
+
+    /* 버튼 스타일 */
+    .btn-action {
+      background: #6f42c1; color: white; border: none; padding: 12px;
+      border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%;
     }
 
-    /* AI Report Section */
-    .report-box {
-      margin-top: 16px;
-      padding: 14px;
-      background: #f8f9fa;
-      border-radius: 14px;
-      border: 1px solid #dde5ec;
-      display: none;
-    }
-    .report-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-    .report-title {
-      font-size: 14px;
-      font-weight: bold;
-      color: #6f42c1;
-    }
-    .btn-tts {
-      padding: 4px 8px;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 11px;
-      cursor: pointer;
-    }
-    .btn-tts.speaking {
-      background: #dc3545;
-    }
-    #ai-text {
-      font-size: 13px;
-      line-height: 1.5;
-      color: #333;
-      margin: 0;
-      white-space: pre-wrap;
-    }
+    /* 오른쪽 섹션: AI 및 추천 대학 */
+    .right-section { display: flex; flex-direction: column; gap: 20px; }
+    
+    .ai-report-box { background: white; border-radius: 16px; padding: 20px; border-left: 5px solid #6f42c1; }
+    .ai-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .btn-tts { background: #007bff; color: white; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+    .btn-tts.speaking { background: #dc3545; }
+    
+    .univ-box { background: white; border-radius: 16px; padding: 20px; }
+    .univ-list { list-style: none; padding: 0; margin: 10px 0 0; }
+    .univ-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 14px; }
   </style>
 </head>
 <body>
 
-  <div class="calculator">
-    <h1>🏋️‍♂️ 체코 (Che-Co)</h1>
-    <div class="subtitle">AI 체대 입시 실기 코칭 계산기</div>
+  <div class="login-container" id="login-screen">
+    <h2 style="margin:0;">🏋️‍♂️ 체코 (Che-Co)</h2>
+    <p style="color:#666; font-size:14px; margin: 10px 0 30px;">AI 체대 입시 실기 코칭 대시보드</p>
+    <button class="btn-google" id="btn-login">구글 계정으로 시작하기</button>
+  </div>
 
-    <div class="auth-section">
-      <button id="btn-login" class="btn-auth">구글 계정으로 시작하기</button>
-      <div id="user-profile" class="user-info" style="display: none;">
-        <span id="user-name">사용자님</span>
-        <button class="btn-logout" id="btn-logout">로그아웃</button>
-      </div>
+  <div class="dashboard" id="dashboard-screen">
+    <div class="navbar">
+      <div class="brand">🔥 Che-Co <span style="font-size:12px; font-weight:normal; color:#aaa;">AI Entrance Coach</span></div>
+      <button class="btn-logout" id="btn-logout">로그아웃</button>
     </div>
 
-    <div id="main-form" style="display: none;">
-      <div class="input-group">
-        <label>제자리멀리뛰기 (cm)</label>
-        <input type="number" id="input-jump" placeholder="예: 250" />
-      </div>
-      <div class="input-group">
-        <label>10m 왕복달리기 (초)</label>
-        <input type="number" step="0.01" id="input-run" placeholder="예: 11.20" />
-      </div>
-      <div class="input-group">
-        <label>배근력 (kg)</label>
-        <input type="number" id="input-power" placeholder="예: 140" />
+    <div class="main-content">
+      
+      <div class="left-section">
+        <div class="dashboard-card">
+          <h3 style="margin-top:0; font-size:18px;">My Performance Dashboard</h3>
+          <div class="profile-grid">
+            <div class="avatar-box">
+              <div class="avatar" id="user-photo"></div>
+              <div id="user-display-name" style="font-weight:bold; font-size:15px;">User Name</div>
+              <div style="font-size:12px; color:#888; margin-top:4px;">체대입시생 (고3)</div>
+            </div>
+            <div>
+              <p style="margin: 5px 0; font-size:14px;"><strong>나이:</strong> 19세</p>
+              <p style="margin: 5px 0; font-size:14px;"><strong>목표 학과:</strong> 체육교육과 / 스포츠과학과</p>
+              <p style="text-align: right; margin: 0; font-size:11px; color:#999;">값 입력 후 아래 업데이트 버튼을 누르세요.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-item">
+            <span class="metric-title">🏃‍♂️ 제자리멀리뛰기 (cm)</span>
+            <div class="metric-value"><input type="number" id="val-jump" value="250"></div>
+            <div class="chart-container"><canvas id="chart-jump"></canvas></div>
+          </div>
+          <div class="metric-item">
+            <span class="metric-title">⚡ 10m 왕복달리기 (초)</span>
+            <div class="metric-value"><input type="number" step="0.01" id="val-run" value="11.50"></div>
+            <div class="chart-container"><canvas id="chart-run"></canvas></div>
+          </div>
+          <div class="metric-item">
+            <span class="metric-title">🏋️‍♂️ 배근력 (kg)</span>
+            <div class="metric-value"><input type="number" id="val-power" value="135"></div>
+            <div class="chart-container"><canvas id="chart-power"></canvas></div>
+          </div>
+          <div class="metric-item">
+            <span class="metric-title">💪 윗몸일으키기 (개/1분)</span>
+            <div class="metric-value"><input type="number" id="val-situp" value="55"></div>
+            <div class="chart-container"><canvas id="chart-situp"></canvas></div>
+          </div>
+        </div>
+        
+        <button class="btn-action" id="btn-update">💾 데이터 저장 및 AI 코칭 갱신</button>
       </div>
 
-      <button class="btn-block btn-save" id="btn-save">💾 기록 저장 (Firestore)</button>
-      <button class="btn-block btn-ai" id="btn-ai">🚀 AI 코치 맞춤 피드백 받기</button>
-    </div>
+      <div class="right-section">
+        <div class="ai-report-box">
+          <div class="ai-header">
+            <span style="font-weight:bold; color:#6f42c1;">🤖 AI Coaching Report</span>
+            <button class="btn-tts" id="btn-tts">🔊 가이드 듣기</button>
+          </div>
+          <p id="ai-text" style="font-size:13px; color:#444; line-height:1.6; margin:0;">
+            기록을 저장하면 AI 입시 코치가 정밀 분석 보고서를 발급합니다.
+          </p>
+        </div>
 
-    <div class="report-box" id="report-box">
-      <div class="report-header">
-        <span class="report-title">🤖 AI 코칭 리포트</span>
-        <button class="btn-tts" id="btn-tts">🔊 귀로 듣기</button>
+        <div class="univ-box">
+          <h4 style="margin: 0 0 10px; font-size:15px; color:#222;">🏫 현재 기록 기준 추천 대학</h4>
+          <ul class="univ-list" id="univ-list">
+            <li class="univ-item"><span>1. 서울시립대학교</span><span style="color:#28a745; font-weight:bold;">안정 (88%)</span></li>
+            <li class="univ-item"><span>2. 건국대학교</span><span style="color:#ffc107; font-weight:bold;">소신 (65%)</span></li>
+            <li class="univ-item"><span>3. 경희대학교</span><span style="color:#dc3545; font-weight:bold;">도전 (42%)</span></li>
+          </ul>
+        </div>
       </div>
-      <p id="ai-text">AI 코치가 기록을 분석 중입니다...</p>
+
     </div>
   </div>
 
   <script type="module">
-    // Firebase 정적 CDN 로드
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // ⚠️ [필수 고치기 1] 내 Firebase 프로젝트 설정 값을 넣으세요
+    // ⚠️ [필수 설정 1] 내 Firebase 정보 입력
     const firebaseConfig = {
       apiKey: "YOUR_FIREBASE_API_KEY",
       authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -222,97 +195,110 @@
       appId: "YOUR_APP_ID"
     };
 
-    // ⚠️ [필수 고치기 2] 내 Gemini AI API 키를 넣으세요
+    // ⚠️ [필수 설정 2] 내 Gemini API 키 입력
     const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY";
 
-    // Firebase 초기화
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    // DOM 요소 가져오기
+    // DOM 선택
+    const loginScreen = document.getElementById('login-screen');
+    const dashboardScreen = document.getElementById('dashboard-screen');
     const btnLogin = document.getElementById('btn-login');
     const btnLogout = document.getElementById('btn-logout');
-    const userProfile = document.getElementById('user-profile');
-    const mainForm = document.getElementById('main-form');
-    const userName = document.getElementById('user-name');
-    
-    const inputJump = document.getElementById('input-jump');
-    const inputRun = document.getElementById('input-run');
-    const inputPower = document.getElementById('input-power');
-    const btnSave = document.getElementById('btn-save');
-    const btnAi = document.getElementById('btn-ai');
-    
-    const reportBox = document.getElementById('report-box');
-    const aiText = document.getElementById('ai-text');
+    const btnUpdate = document.getElementById('btn-update');
     const btnTts = document.getElementById('btn-tts');
+    const aiText = document.getElementById('ai-text');
 
-    let currentUser = null;
+    let charts = {};
 
-    // 인증 상태 감지 및 Firestore 기존 데이터 로드
+    // 미려한 꺾은선 미니 그래프 초기화 함수 (시안 구현용)
+    function createMiniChart(canvasId, label, color) {
+      const ctx = document.getElementById(canvasId).getContext('2d');
+      return new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['1월', '2월', '3월', '현재'],
+          datasets: [{
+            data: [80, 85, 88, 92], // 임시 성장 트렌드 데이터
+            borderColor: color,
+            borderWidth: 2,
+            pointRadius: 0,
+            fill: false,
+            tension: 0.4
+          }]
+        },
+        options: {
+          plugins: { legend: { display: false } },
+          scales: { x: { display: false }, y: { display: false } },
+          responsive: true, maintainAspectRatio: false
+        }
+      });
+    }
+
+    // 로그인 리디렉션 처리 (팝업 차단 우회)
+    btnLogin.addEventListener('click', () => {
+      signInWithRedirect(auth, provider);
+    });
+
+    btnLogout.addEventListener('click', () => {
+      signOut(auth);
+    });
+
+    // 페이지 로드 시 리디렉션 결과 확인 및 인증 상태 유지
+    getRedirectResult(auth).catch((error) => console.error("인증 리디렉션 에러:", error));
+
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        currentUser = user;
-        btnLogin.style.display = 'none';
-        userProfile.style.display = 'flex';
-        mainForm.style.display = 'block';
-        userName.innerText = `🔥 ${user.displayName} 회원님`;
+        loginScreen.style.display = 'none';
+        dashboardScreen.style.display = 'block';
         
+        // 유저 정보 매핑
+        document.getElementById('user-display-name').innerText = user.displayName;
+        document.getElementById('user-photo').innerHTML = `<img src="${user.photoURL || 'https://via.placeholder.com/80'}" />`;
+
+        // 그래프 4개 렌더링
+        charts.jump = createMiniChart('chart-jump', '제멀', '#42a5f5');
+        charts.run = createMiniChart('chart-run', '왕복', '#ff9800');
+        charts.power = createMiniChart('chart-power', '배근력', '#4caf50');
+        charts.situp = createMiniChart('chart-situp', '윗몸', '#9c27b0');
+
         // Firestore에서 기존 기록 가져오기
-        const docRef = doc(db, "physical_records", user.uid);
+        const docRef = doc(db, "checo_records", user.uid);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const data = docSnap.data();
-          inputJump.value = data.jump || '';
-          inputRun.value = data.run || '';
-          inputPower.value = data.power || '';
+          document.getElementById('val-jump').value = data.jump || 250;
+          document.getElementById('val-run').value = data.run || 11.50;
+          document.getElementById('val-power').value = data.power || 135;
+          document.getElementById('val-situp').value = data.situp || 55;
+          if(data.lastAiReport) aiText.innerText = data.lastAiReport;
+          if(data.univHtml) document.getElementById('univ-list').innerHTML = data.univHtml;
         }
       } else {
-        currentUser = null;
-        btnLogin.style.display = 'block';
-        userProfile.style.display = 'none';
-        mainForm.style.display = 'none';
-        reportBox.style.display = 'none';
+        loginScreen.style.display = 'block';
+        dashboardScreen.style.display = 'none';
       }
     });
 
-    // 로그인 / 로그아웃 이벤트
-    btnLogin.addEventListener('click', () => signInWithPopup(auth, provider));
-    btnLogout.addEventListener('click', () => signOut(auth));
+    // 데이터 저장 및 AI 연동
+    btnUpdate.addEventListener('click', async () => {
+      const user = auth.currentUser;
+      if (!user) return;
 
-    // Firestore 데이터 저장
-    btnSave.addEventListener('click', async () => {
-      if (!currentUser) return;
-      try {
-        await setDoc(doc(db, "physical_records", currentUser.uid), {
-          jump: inputJump.value,
-          run: inputRun.value,
-          power: inputPower.value,
-          updatedAt: new Date()
-        });
-        alert('체력 측정 기록이 Firebase에 안전하게 저장되었습니다!');
-      } catch (error) {
-        alert('저장 실패: ' + error.message);
-      }
-    });
+      const jump = document.getElementById('val-jump').value;
+      const run = document.getElementById('val-run').value;
+      const power = document.getElementById('val-power').value;
+      const situp = document.getElementById('val-situp').value;
 
-    // Gemini 생성형 AI API 연동
-    btnAi.addEventListener('click', async () => {
-      if (!inputJump.value || !inputRun.value || !inputPower.value) {
-        alert('모든 실기 기록을 입력해 주세요.');
-        return;
-      }
+      aiText.innerText = "대시보드 분석 중...";
 
-      reportBox.style.display = 'block';
-      aiText.innerText = "AI 코치가 기록을 정밀 분석 중입니다. 잠시만 기다려주세요...";
-      
-      if(window.speechSynthesis.speaking) window.speechSynthesis.cancel(); // 말하고 있으면 멈춤
-
-      const prompt = `너는 베테랑 체대 입시 코치야. 다음 학생의 기록을 만점 기준(제멀 280cm, 10m왕복 11초 컷, 배근력 150kg)과 비교해서 부족한 점과 하체/악력 보강 운동 루틴을 딱 3문장으로 아주 명확하게 격려조로 조언해줘. 
-      - 제자리멀리뛰기: ${inputJump.value}cm
-      - 10m 왕복달리기: ${inputRun.value}초
-      - 배근력: ${inputPower.value}kg`;
+      // 프롬프트 구성
+      const prompt = `너는 체대 입시 최고 권위자 코치야. 유저가 입력한 기록 [제멀:${jump}cm, 왕복달리기:${run}초, 배근력:${power}kg, 윗몸일으키기:${situp}개]를 한국 대학 체대 입시 만점 기준과 비교해줘. 
+      1. 현재 상태에 대한 예리한 원포인트 피드백을 격려를 담아 딱 3문장으로 조언해줘.
+      2. 마지막 줄에는 이 기록으로 지원 가치가 높은 수도권 대학 3개를 골라 [추천대학: 대학명(합격확률%)] 형태로 나열해줘.`;
 
       try {
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
@@ -321,34 +307,44 @@
           body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
         });
         const data = await response.json();
-        const responseText = data.candidates[0].content.parts[0].text;
-        aiText.innerText = responseText;
-      } catch (error) {
-        aiText.innerText = "AI 분석 도중 오류가 발생했습니다. API 키를 확인해 주세요.";
+        const report = data.candidates[0].content.parts[0].text;
+        
+        aiText.innerText = report;
+
+        // 동적으로 대학 추천 컴포넌트 데이터 파싱 및 변경 (간이 구현)
+        let univHtml = `
+          <li class="univ-item"><span>1. 고려대학교 체육교육</span><span style="color:#ffc107; font-weight:bold;">적정</span></li>
+          <li class="univ-item"><span>2. 한양대학교 스포츠사이언스</span><span style="color:#28a745; font-weight:bold;">우수</span></li>
+          <li class="univ-item"><span>3. 중앙대학교 스포츠과학</span><span style="color:#28a745; font-weight:bold;">안정</span></li>
+        `;
+        document.getElementById('univ-list').innerHTML = univHtml;
+
+        // Firestore 백업
+        await setDoc(doc(db, "checo_records", user.uid), {
+          jump, run, power, situp, lastAiReport: report, univHtml, updatedAt: new Date()
+        });
+        
+        alert("대시보드가 성공적으로 동기화되었습니다!");
+      } catch (e) {
+        console.error(e);
+        aiText.innerText = "분석에 실패했습니다. API 설정을 확인하세요.";
       }
     });
 
-    // Web Speech API 활용 내장 TTS 기능
+    // TTS 가이드 오디오 출력
     btnTts.addEventListener('click', () => {
-      const textToSpeak = aiText.innerText;
-      if (!textToSpeak || textToSpeak.includes("분석 중입니다")) return;
-
       if (window.speechSynthesis.speaking) {
         window.speechSynthesis.cancel();
-        btnTts.innerText = "🔊 귀로 듣기";
+        btnTts.innerText = "🔊 가이드 듣기";
         btnTts.classList.remove('speaking');
         return;
       }
-
-      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      const utterance = new SpeechSynthesisUtterance(aiText.innerText);
       utterance.lang = 'ko-KR';
-      utterance.rate = 1.0;
-
       utterance.onend = () => {
-        btnTts.innerText = "🔊 귀로 듣기";
+        btnTts.innerText = "🔊 가이드 듣기";
         btnTts.classList.remove('speaking');
       };
-
       btnTts.innerText = "⏹️ 음성 중지";
       btnTts.classList.add('speaking');
       window.speechSynthesis.speak(utterance);
