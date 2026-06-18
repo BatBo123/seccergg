@@ -797,4 +797,32 @@
             const data = snap.data();
             dom.korean.value = data.academic?.korean || 85;
             dom.english.value = data.academic?.english || 2;
-            dom.society.
+            dom.society.value = data.academic?.society || 88;
+            dom.jump.value = data.metrics?.jump || 265;
+            dom.run.value = data.metrics?.run || 11.20;
+            dom.power.value = data.metrics?.power || 145;
+            dom.situp.value = data.metrics?.situp || 58;
+            
+            if (data.persistedAiReport) dom.aiOutput.innerText = data.persistedAiReport;
+            if (data.persistedUnivHtml) dom.collegeWrapper.innerHTML = data.persistedUnivHtml;
+
+            // 로드 데이터 기반 차트 리프레시 재실행
+            refreshCharts();
+          }
+        } catch (err) {
+          console.error("Firestore 복원 실패:", err);
+        }
+      } else {
+        dom.loginContainer.style.display = 'block';
+        dom.dashboardContainer.style.display = 'none';
+        clearFormInputs();
+      }
+    });
+
+    function clearFormInputs() {
+      dom.email.value = "";
+      dom.password.value = "";
+    }
+
+    function refreshCharts() {
+      renderPerformanceChart('canvas-jump
