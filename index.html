@@ -1,828 +1,237 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Che-Co Premier : Elite AI Sports Intelligence Dashboard</title>
-  
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>나만의 AI 헬스 트레이너</title>
   <style>
-    /* -------------------------------------------------------------
-       1. GLOBAL RESET & DESIGN SYSTEM VARIABLES
-    ------------------------------------------------------------- */
-    :root {
-      --bg-gradient-start: #0a0f1d;
-      --bg-gradient-end: #071426;
-      --panel-bg: rgba(255, 255, 255, 0.04);
-      --panel-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #f8fafc;
-      --text-secondary: #94a3b8;
-      --text-muted: #64748b;
-      --primary: #6366f1;
-      --primary-hover: #4f46e5;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --font-main: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: var(--font-main);
-      -webkit-font-smoothing: antialiased;
-    }
-
-    body {
-      background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
-      color: var(--text-primary);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 30px;
-      overflow-x: hidden;
-    }
-
-    /* 스크롤바 커스텀 */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.1); }
-    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
-
-    /* -------------------------------------------------------------
-       2. AUTHENTICATION CONTEXT STYLES
-    ------------------------------------------------------------- */
-    .login-wrapper {
-      width: 100%;
-      max-width: 460px;
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid var(--panel-border);
-      backdrop-filter: blur(20px);
-      border-radius: 28px;
-      padding: 45px 40px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .login-header {
-      text-align: center;
-      margin-bottom: 35px;
-    }
-
-    .login-header .logo-icon {
-      font-size: 42px;
-      background: linear-gradient(135deg, #818cf8, #6366f1);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 12px;
-      display: inline-block;
-    }
-
-    .login-header h2 {
-      font-size: 28px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      color: var(--text-primary);
-    }
-
-    .login-header p {
-      font-size: 14px;
-      color: var(--text-secondary);
-      margin-top: 6px;
-    }
-
-    .form-group {
-      margin-bottom: 22px;
-      position: relative;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .input-wrapper {
-      position: relative;
-    }
-
-    .input-wrapper i {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-      font-size: 16px;
-    }
-
-    .form-group input {
-      width: 100%;
-      padding: 14px 16px 14px 48px;
-      background: rgba(0, 0, 0, 0.2);
-      border: 1px solid var(--panel-border);
-      border-radius: 12px;
-      color: var(--text-primary);
-      font-size: 15px;
-      outline: none;
-      transition: all 0.2s ease;
-    }
-
-    .form-group input:focus {
-      border-color: var(--primary);
-      background: rgba(0, 0, 0, 0.4);
-      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
-    }
-
-    .auth-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-top: 30px;
-    }
-
-    .btn {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.2s ease;
-    }
-
-    .btn-primary { background: var(--primary); color: white; }
-    .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
-    .btn-secondary { background: rgba(255, 255, 255, 0.05); color: var(--text-primary); border: 1px solid var(--panel-border); }
-    .btn-secondary:hover { background: rgba(255, 255, 255, 0.1); }
-
-    /* -------------------------------------------------------------
-       3. ENTERPRISE DASHBOARD LAYOUT
-    ------------------------------------------------------------- */
-    .dashboard-container {
-      display: none;
-      width: 1440px;
-      max-width: 100%;
-      background: rgba(10, 15, 30, 0.7);
-      border: 1px solid var(--panel-border);
-      backdrop-filter: blur(30px);
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6);
-    }
-
-    /* 글로벌 네비게이션 헤더 */
-    .app-header {
-      background: rgba(15, 23, 42, 0.4);
-      border-bottom: 1px solid var(--panel-border);
-      padding: 18px 35px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .app-header .brand-area {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .app-header .brand-logo {
-      background: linear-gradient(135deg, var(--primary), #a855f7);
-      width: 36px; height: 36px; border-radius: 10px;
-      display: flex; justify-content: center; align-items: center;
-      font-weight: 900; color: white; font-size: 18px;
-    }
-
-    .app-header h1 {
-      font-size: 20px; font-weight: 800; letter-spacing: -0.5px;
-    }
-
-    .app-header .user-meta {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .user-profile-tag {
-      display: flex; align-items: center; gap: 10px;
-      background: rgba(255,255,255,0.03); padding: 6px 14px;
-      border-radius: 30px; border: 1px solid var(--panel-border);
-    }
-
-    .user-profile-tag img {
-      width: 22px; height: 22px; border-radius: 50%;
-    }
-
-    .user-profile-tag span {
-      font-size: 13px; font-weight: 600; color: var(--text-secondary);
-    }
-
-    .btn-logout {
-      background: transparent; border: 1px solid rgba(239, 68, 68, 0.3);
-      color: var(--danger); padding: 8px 14px; border-radius: 8px;
-      font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
-    }
-    .btn-logout:hover { background: rgba(239, 68, 68, 0.1); }
-
-    /* 대시보드 코어 콘텐츠 격자망 구조 */
-    .dashboard-grid {
-      padding: 35px;
-      display: grid;
-      grid-template-columns: 2.7fr 1.3fr;
-      gap: 30px;
-    }
-
-    .section-title {
-      font-size: 18px; font-weight: 700; margin-bottom: 20px;
-      display: flex; align-items: center; gap: 10px;
-    }
-
-    .section-title i { color: var(--primary); }
-
-    /* 패널 카드 컴포넌트 */
-    .card-panel {
-      background: var(--panel-bg);
-      border: 1px solid var(--panel-border);
-      border-radius: 18px;
-      padding: 25px;
-      margin-bottom: 25px;
-    }
-
-    /* 학생 프로필 요약 섹션 */
-    .profile-hero {
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      gap: 25px;
-      align-items: center;
-    }
-
-    .hero-avatar {
-      width: 75px; height: 75px; border-radius: 20px;
-      background: rgba(99, 102, 241, 0.15); border: 2px solid var(--primary);
-      display: flex; justify-content: center; align-items: center;
-      font-size: 32px;
-    }
-
-    .hero-details h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-    .hero-details p { font-size: 14px; color: var(--text-secondary); }
-    .badge-group { display: flex; gap: 8px; margin-top: 8px; }
-    .badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; }
-    .badge-primary { background: rgba(99,102,241,0.2); color: #a5b4fc; }
-    .badge-success { background: rgba(16,185,129,0.2); color: #6ee7b7; }
-
-    /* 학업 성적 및 가중치 수치 영역 */
-    .academic-row {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px;
-    }
-
-    .academic-box {
-      background: rgba(0,0,0,0.15); padding: 12px 15px; border-radius: 10px;
-      border: 1px solid var(--panel-border);
-    }
-
-    .academic-box label { font-size: 11px; color: var(--text-muted); font-weight: bold; display: block; margin-bottom: 4px;}
-    .academic-box input { background: transparent; border: none; color: white; font-size: 16px; font-weight: 700; width: 100%; outline: none;}
-
-    /* 실기 정밀 지표 리스트 */
-    .performance-matrix-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
-    }
-
-    .matrix-card {
-      background: rgba(15, 23, 42, 0.3);
-      border: 1px solid var(--panel-border);
-      border-radius: 16px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      position: relative;
-    }
-
-    .matrix-card-header {
-      display: flex; justify-content: space-between; align-items: flex-start;
-      margin-bottom: 15px;
-    }
-
-    .matrix-title { font-size: 14px; font-weight: 600; color: var(--text-secondary); }
-    .matrix-score-input { display: flex; align-items: baseline; gap: 5px; margin: 10px 0; }
-    
-    .matrix-score-input input {
-      background: transparent; border: none; border-bottom: 2px solid var(--panel-border);
-      color: white; font-size: 28px; font-weight: 800; width: 110px; outline: none; transition: 0.2s;
-    }
-    .matrix-score-input input:focus { border-bottom-color: var(--primary); }
-    .matrix-score-input span { font-size: 14px; color: var(--text-muted); font-weight: 600; }
-
-    .chart-box { height: 100px; width: 100%; margin-top: 15px; }
-
-    /* AI 리포팅 패널 컨텍스트 */
-    .ai-container {
-      display: flex; flex-direction: column; height: 100%;
-    }
-
-    .report-card {
-      background: linear-gradient(180deg, rgba(99,102,241,0.05) 0%, rgba(0,0,0,0) 100%);
-      border: 1px solid rgba(99, 102, 241, 0.2);
-      border-radius: 18px; padding: 25px; flex-grow: 1;
-      display: flex; flex-direction: column;
-    }
-
-    .report-card-header {
-      display: flex; justify-content: space-between; align-items: center;
-      border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 15px; margin-bottom: 15px;
-    }
-
-    .ai-badge {
-      background: linear-gradient(90deg, #6366f1, #a855f7); color: white;
-      padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700;
-      display: flex; align-items: center; gap: 6px;
-    }
-
-    .btn-audio-trigger {
-      background: rgba(255,255,255,0.05); border: 1px solid var(--panel-border);
-      color: var(--text-primary); padding: 8px 12px; border-radius: 10px;
-      font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;
-    }
-    .btn-audio-trigger.playing { background: var(--danger); border-color: var(--danger); }
-
-    .report-body {
-      font-size: 14px; color: #cbd5e1; line-height: 1.7; flex-grow: 1;
-      overflow-y: auto; max-height: 250px; padding-right: 5px;
-    }
-
-    /* 대학 예측 시스템 리스트 */
-    .college-prediction-panel { margin-top: 25px; }
-    
-    .college-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
-    
-    .college-item {
-      background: rgba(255,255,255,0.02); border: 1px solid var(--panel-border);
-      border-radius: 12px; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;
-    }
-
-    .college-info .name { font-size: 15px; font-weight: 700; color: var(--text-primary); }
-    .college-info .dept { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-    
-    .status-pill {
-      padding: 6px 14px; border-radius: 30px; font-size: 12px; font-weight: 800;
-    }
-    .status-safe { background: rgba(16,185,129,0.15); color: #34d399; }
-    .status-optimal { background: rgba(245,158,11,0.15); color: #fbbf24; }
-    .status-danger { background: rgba(239,68,68,0.15); color: #f87171; }
-
-    /* 로딩 인디케이터 오버레이 효과 */
-    .loading-overlay {
-      position: absolute; left:0; top:0; width:100%; height:100%;
-      background: rgba(7, 20, 38, 0.85); border-radius: 18px;
-      display: none; flex-direction: column; justify-content: center; align-items: center;
-      z-index: 10; backdrop-filter: blur(5px);
-    }
-
-    .spinner {
-      width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1);
-      border-top-color: var(--primary); border-radius: 50%;
-      animation: spin 1s infinite linear; margin-bottom: 12px;
-    }
-
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    h1, h2 { text-align: center; color: #2c3e50; }
+    input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 16px; }
+    button { background-color: #3498db; color: white; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
+    button:hover { background-color: #2980b9; }
+    .hidden { display: none; }
+    .routine-box { background: #e8f6f3; padding: 15px; border-radius: 8px; margin-top: 20px; white-space: pre-wrap; line-height: 1.5; }
+    .log-list { list-style: none; padding: 0; }
+    .log-item { background: #fff; border: 1px solid #eee; margin-bottom: 10px; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    #audio-container { margin-top: 15px; text-align: center; }
   </style>
 </head>
 <body>
 
-  <div class="login-wrapper" id="login-container">
-    <div class="login-header">
-      <div class="logo-icon"><i class="fa-solid fa-dumbbell"></i></div>
-      <h2>Che-Co Intelligence</h2>
-      <p>Elite AI Sports Performance Dashboard</p>
-    </div>
+<div class="container">
+  <h1>💪 AI 헬스 트레이너</h1>
 
-    <div class="form-group">
-      <label for="input-email">이메일 주소</label>
-      <div class="input-wrapper">
-        <i class="fa-solid fa-envelope"></i>
-        <input type="email" id="input-email" placeholder="student@checo.com" autocomplete="off" />
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="input-password">보안 비밀번호</label>
-      <div class="input-wrapper">
-        <i class="fa-solid fa-lock"></i>
-        <input type="password" id="input-password" placeholder="••••••••" />
-      </div>
-    </div>
-
-    <div class="auth-actions">
-      <button class="btn btn-primary" id="trigger-login">
-        <i class="fa-solid fa-right-to-bracket"></i> 플랫폼 로그인
-      </button>
-      <button class="btn btn-secondary" id="trigger-signup">
-        <i class="fa-solid fa-user-plus"></i> 신규 선수 등록 (회원가입)
-      </button>
-    </div>
+  <div id="auth-section">
+    <h2>로그인</h2>
+    <input type="email" id="email" placeholder="이메일 주소">
+    <input type="password" id="password" placeholder="비밀번호">
+    <button id="login-btn">로그인</button>
+    <button id="signup-btn" style="background-color: #2ecc71;">회원가입</button>
   </div>
 
-  <div class="dashboard-container" id="dashboard-container">
-    
-    <header class="app-header">
-      <div class="brand-area">
-        <div class="brand-logo">C</div>
-        <h1>CHE-CO <span style="font-weight: 300; font-size:14px; color:var(--text-secondary);">PREMIER</span></h1>
-      </div>
-      <div class="user-meta">
-        <div class="user-profile-tag">
-          <div class="avatar-icon"><i class="fa-solid fa-user-check" style="color:var(--primary);"></i></div>
-          <span id="label-user-identity">loading...</span>
-        </div>
-        <button class="btn-logout" id="trigger-logout">
-          <i class="fa-solid fa-power-off"></i> 시스템 로그아웃
-        </button>
-      </div>
-    </header>
+  <div id="main-section" class="hidden">
+    <p id="user-greeting" style="text-align: center; font-weight: bold;"></p>
+    <button id="logout-btn" style="background-color: #e74c3c; width: auto; display: block; margin: 0 auto 20px auto;">로그아웃</button>
+    <hr>
 
-    <main class="dashboard-grid">
-      
-      <section class="left-workspace">
-        
-        <div class="card-panel profile-hero">
-          <div class="hero-avatar">🏃‍♂️</div>
-          <div class="hero-details">
-            <h2>Elite 입시전형 상태 분석</h2>
-            <p>신체 정보 고3 / 체육교육 및 스포츠과학 전공 지망생</p>
-            <div class="badge-group">
-              <span class="badge badge-primary"><i class="fa-solid fa-bolt"></i> 실기 우수자 전형</span>
-              <span class="badge badge-success"><i class="fa-solid fa-award"></i> AI 실시간 최적화 중</span>
-            </div>
-          </div>
-          
-          <div class="academic-row">
-            <div class="academic-box">
-              <label>국어 백분위</label>
-              <input type="number" id="score-korean" value="85" max="100" />
-            </div>
-            <div class="academic-box">
-              <label>영어 등급</label>
-              <input type="number" id="score-english" value="2" max="9" />
-            </div>
-            <div class="academic-box">
-              <label>탐구 평균 백분위</label>
-              <input type="number" id="score-society" value="88" max="100" />
-            </div>
-          </div>
-        </div>
+    <h2>오늘의 운동 세팅</h2>
+    <select id="target-muscle">
+      <option value="가슴과 삼두">가슴과 삼두</option>
+      <option value="등과 이두">등과 이두</option>
+      <option value="하체와 어깨">하체와 어깨</option>
+      <option value="전신 유산소 및 코어">전신 유산소 및 코어</option>
+    </select>
+    <select id="time-limit">
+      <option value="30분">30분 (빠르고 굵게)</option>
+      <option value="50분">50분 (일반적인 루틴)</option>
+      <option value="90분">90분 (하드코어)</option>
+    </select>
+    <button id="generate-btn">AI 루틴 생성하기</button>
 
-        <h3 class="section-title"><i class="fa-solid fa-chart-simple"></i> 핵심 실기 종목 기록 시스템</h3>
-        
-        <div class="performance-matrix-grid">
-          
-          <div class="matrix-card">
-            <div class="matrix-card-header">
-              <span class="matrix-title">제자리멀리뛰기</span>
-              <i class="fa-solid fa-person-running" style="color:#42a5f5;"></i>
-            </div>
-            <div class="matrix-score-input">
-              <input type="number" id="metric-jump" value="265" />
-              <span>cm</span>
-            </div>
-            <div class="chart-box"><canvas id="canvas-jump"></canvas></div>
-          </div>
+    <div id="loading" class="hidden" style="text-align: center; margin-top: 10px;">AI 트레이너가 루틴을 짜는 중입니다... ⏳</div>
 
-          <div class="matrix-card">
-            <div class="matrix-card-header">
-              <span class="matrix-title">10m 왕복달리기</span>
-              <i class="fa-solid fa-stopwatch" style="color:#ff9800;"></i>
-            </div>
-            <div class="matrix-score-input">
-              <input type="number" step="0.01" id="metric-run" value="11.20" />
-              <span>초</span>
-            </div>
-            <div class="chart-box"><canvas id="canvas-run"></canvas></div>
-          </div>
+    <div id="result-section" class="hidden">
+      <div id="routine-output" class="routine-box"></div>
+      <button id="tts-btn" style="background-color: #f39c12;">🎧 오디오 코칭 듣기 (TTS)</button>
+      <div id="audio-container"></div>
+      <button id="save-btn" style="background-color: #9b59b6;">💾 내 운동 일지에 저장</button>
+    </div>
 
-          <div class="matrix-card">
-            <div class="matrix-card-header">
-              <span class="matrix-title">배근력</span>
-              <i class="fa-solid fa-dumbbell" style="color:#4caf50;"></i>
-            </div>
-            <div class="matrix-score-input">
-              <input type="number" id="metric-power" value="145" />
-              <span>kg</span>
-            </div>
-            <div class="chart-box"><canvas id="canvas-power"></canvas></div>
-          </div>
-
-          <div class="matrix-card">
-            <div class="matrix-card-header">
-              <span class="matrix-title">윗몸일으키기 (1분)</span>
-              <i class="fa-solid fa-child" style="color:#9c27b0;"></i>
-            </div>
-            <div class="matrix-score-input">
-              <input type="number" id="metric-situp" value="58" />
-              <span>개</span>
-            </div>
-            <div class="chart-box"><canvas id="canvas-situp"></canvas></div>
-          </div>
-
-        </div>
-
-        <button class="btn btn-primary" id="trigger-data-sync" style="margin-top: 25px; padding: 18px;">
-          <i class="fa-solid fa-cloud-arrow-up"></i> 지표 영속 클라우드 저장 및 OpenAI GPT 심층 진단 컨설팅 실행
-        </button>
-
-      </section>
-
-      <section class="right-workspace ai-container">
-        
-        <div class="card-panel report-card" style="position: relative;">
-          <div class="loading-overlay" id="ai-loading-mask">
-            <div class="spinner"></div>
-            <p style="font-size:13px; font-weight:700; color:var(--text-secondary);">GPT-4o 입시 추론 엔진 연동 중...</p>
-          </div>
-
-          <div class="report-card-header">
-            <div class="ai-badge"><i class="fa-solid fa-brain"></i> GPT AI Coach Report</div>
-            <button class="btn-audio-trigger" id="trigger-tts">
-              <i class="fa-solid fa-volume-high"></i> 오디오 가이드 브리핑 듣기
-            </button>
-          </div>
-          
-          <div class="report-body" id="text-ai-output">
-            대시보드 좌측에 위치한 정시 수능 성적 스케일링 지표 및 4종 핵심 실기 능력 수치를 기입하신 뒤 아래 '저장 및 컨설팅' 실행 단추를 터치하시면 실시간 다차원 합격 확률 추론 리포트가 이곳에 출력됩니다.
-          </div>
-        </div>
-
-        <div class="card-panel college-prediction-panel">
-          <h3 class="section-title" style="margin-bottom: 15px;"><i class="fa-solid fa-university"></i> 실시간 모의지원 스나이핑 라인</h3>
-          <ul class="college-list" id="wrapper-college-list">
-            <li class="college-item">
-              <div class="college-info">
-                <div class="name">서울시립대학교</div>
-                <div class="dept">스포츠과학과 [정시 가군]</div>
-              </div>
-              <span class="status-pill status-safe">안정권 (82%)</span>
-            </li>
-            <li class="college-item">
-              <div class="college-info">
-                <div class="name">건국대학교</div>
-                <div class="dept">체육교육과 [정시 나군]</div>
-              </div>
-              <span class="status-pill status-optimal">소신 적정 (61%)</span>
-            </li>
-            <li class="college-item">
-              <div class="college-info">
-                <div class="name">고려대학교</div>
-                <div class="dept">체육교육과 [정시 가군]</div>
-              </div>
-              <span class="status-pill status-danger">상향 도전 (38%)</span>
-            </li>
-          </ul>
-        </div>
-
-      </section>
-
-    </main>
+    <hr>
+    <h2>나의 운동 일지</h2>
+    <ul id="log-list" class="log-list"></ul>
   </div>
+</div>
 
-  <script type="module">
-    // -------------------------------------------------------------
-    // 4. MODULE ARCHITECTURE DECLARATION & INJECTION
-    // -------------------------------------------------------------
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { 
-      getAuth, 
-      createUserWithEmailAndPassword, 
-      signInWithEmailAndPassword, 
-      signOut, 
-      onAuthStateChanged 
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { 
-      getFirestore, 
-      doc, 
-      setDoc, 
-      getDoc 
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+  import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-    // 📌 [발표 전 확인] 내 파이어베이스 프로젝트 키값으로 교체
-    const firebaseConfig = {
-      apiKey: "YOUR_FIREBASE_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
+  // 🔴 1. Firebase 설정 (본인의 Firebase 프로젝트 설정값으로 변경하세요)
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_MESSAGING_ID",
+    appId: "YOUR_APP_ID"
+  };
 
-    // 📌 [발표 전 확인] 내 OpenAI 계정의 유효한 Secret API Key 기입
-    const OPENAI_API_KEY = "YOUR_OPENAI_API_KEY";
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
 
-    // 인스턴스 이니셜라이징
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+  // 🔴 2. Google Apps Script Web App URL (본인의 배포 URL로 변경하세요)
+  const GAS_WEB_APP_URL = "YOUR_WEB_APP_URL"; 
 
-    // -------------------------------------------------------------
-    // 5. DOM ELEMENTS CACHING LAYER
-    // -------------------------------------------------------------
-    const dom = {
-      loginContainer: document.getElementById('login-container'),
-      dashboardContainer: document.getElementById('dashboard-container'),
-      email: document.getElementById('input-email'),
-      password: document.getElementById('input-password'),
-      btnLogin: document.getElementById('trigger-login'),
-      btnSignup: document.getElementById('trigger-signup'),
-      btnLogout: document.getElementById('trigger-logout'),
-      btnUpdate: document.getElementById('trigger-data-sync'),
-      btnTts: document.getElementById('trigger-tts'),
-      aiOutput: document.getElementById('text-ai-output'),
-      loadingMask: document.getElementById('ai-loading-mask'),
-      userLabel: document.getElementById('label-user-identity'),
-      collegeWrapper: document.getElementById('wrapper-college-list'),
-      
-      // 입력 지표 데이터 캐싱
-      korean: document.getElementById('score-korean'),
-      english: document.getElementById('score-english'),
-      society: document.getElementById('score-society'),
-      jump: document.getElementById('metric-jump'),
-      run: document.getElementById('metric-run'),
-      power: document.getElementById('metric-power'),
-      situp: document.getElementById('metric-situp')
-    };
+  // UI 요소 가져오기
+  const authSection = document.getElementById('auth-section');
+  const mainSection = document.getElementById('main-section');
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const loginBtn = document.getElementById('login-btn');
+  const signupBtn = document.getElementById('signup-btn');
+  const logoutBtn = document.getElementById('logout-btn');
+  const userGreeting = document.getElementById('user-greeting');
+  
+  const generateBtn = document.getElementById('generate-btn');
+  const loading = document.getElementById('loading');
+  const resultSection = document.getElementById('result-section');
+  const routineOutput = document.getElementById('routine-output');
+  const ttsBtn = document.getElementById('tts-btn');
+  const audioContainer = document.getElementById('audio-container');
+  const saveBtn = document.getElementById('save-btn');
+  const logList = document.getElementById('log-list');
 
-    let chartInstances = {};
+  let currentRoutine = "";
+  let currentUserInfo = null;
 
-    // -------------------------------------------------------------
-    // 6. VISUALIZATION COMPONENT CONTROLLER (CHART.JS)
-    // -------------------------------------------------------------
-    function renderPerformanceChart(canvasId, lineColor, dataPoints) {
-      const ctx = document.getElementById(canvasId).getContext('2d');
-      
-      if (chartInstances[canvasId]) {
-        chartInstances[canvasId].destroy();
-      }
+  // --- [인증 기능] ---
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      currentUserInfo = user;
+      authSection.classList.add('hidden');
+      mainSection.classList.remove('hidden');
+      userGreeting.innerText = `${user.email}님, 오늘도 득근하세요!`;
+      loadWorkoutLogs(user.uid);
+    } else {
+      currentUserInfo = null;
+      authSection.classList.remove('hidden');
+      mainSection.classList.add('hidden');
+    }
+  });
 
-      // 차트 백그라운드 선형 그라데이션 알파값 처리
-      const gradient = ctx.createLinearGradient(0, 0, 0, 80);
-      gradient.addColorStop(0, lineColor + '33');
-      gradient.addColorStop(1, lineColor + '00');
+  loginBtn.addEventListener('click', () => {
+    signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value)
+      .then(() => alert("로그인 성공!"))
+      .catch(error => alert("로그인 실패: " + error.message));
+  });
 
-      chartInstances[canvasId] = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: ['기초테스트', '3월 학평', '5월 자체평가', '현재측정'],
-          datasets: [{
-            data: dataPoints,
-            borderColor: lineColor,
-            borderWidth: 2,
-            pointBackgroundColor: lineColor,
-            pointRadius: 1,
-            pointHoverRadius: 4,
-            fill: true,
-            backgroundColor: gradient,
-            tension: 0.35
-          }]
-        },
-        options: {
-          plugins: { legend: { display: false }, tooltip: { enabled: true } },
-          scales: {
-            x: { display: false },
-            y: { display: false }
-          },
-          responsive: true,
-          maintainAspectRatio: false
-        }
+  signupBtn.addEventListener('click', () => {
+    createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value)
+      .then(() => alert("회원가입 성공!"))
+      .catch(error => alert("회원가입 실패: " + error.message));
+  });
+
+  logoutBtn.addEventListener('click', () => {
+    signOut(auth);
+  });
+
+  // --- [AI 생성 기능 (Apps Script 호출)] ---
+  generateBtn.addEventListener('click', async () => {
+    const muscle = document.getElementById('target-muscle').value;
+    const time = document.getElementById('time-limit').value;
+    const prompt = `너는 전문 헬스 트레이너야. 사용자가 ${time} 동안 할 수 있는 ${muscle} 운동 루틴을 짜줘. 친근하고 동기부여가 되는 말투로 설명해줘.`;
+
+    loading.classList.remove('hidden');
+    resultSection.classList.add('hidden');
+    audioContainer.innerHTML = ''; // 기존 오디오 초기화
+
+    try {
+      const response = await fetch(GAS_WEB_APP_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `type=chat&prompt=${encodeURIComponent(prompt)}`
       });
+      const data = await response.json();
+      currentRoutine = data.result;
+      routineOutput.innerText = currentRoutine;
+      
+      loading.classList.add('hidden');
+      resultSection.classList.remove('hidden');
+    } catch (error) {
+      alert("루틴 생성에 실패했습니다.");
+      loading.classList.add('hidden');
     }
+  });
 
-    // -------------------------------------------------------------
-    // 7. USER AUTHENTICATION & SESSION LIFECYCLE CONTROLLER
-    // -------------------------------------------------------------
+  // --- [TTS 오디오 생성 기능] ---
+  ttsBtn.addEventListener('click', async () => {
+    ttsBtn.innerText = "오디오 생성 중... ⏳";
+    ttsBtn.disabled = true;
+
+    try {
+      const response = await fetch(GAS_WEB_APP_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `type=tts&text=${encodeURIComponent(currentRoutine)}`
+      });
+      const data = await response.json();
+      
+      // base64 오디오 데이터를 audio 태그로 변환
+      const audioTag = `<audio controls autoplay src="data:audio/mp3;base64,${data.audioBase64}"></audio>`;
+      audioContainer.innerHTML = audioTag;
+      
+    } catch (error) {
+      alert("오디오 생성에 실패했습니다.");
+    } finally {
+      ttsBtn.innerText = "🎧 오디오 코칭 듣기 (TTS)";
+      ttsBtn.disabled = false;
+    }
+  });
+
+  // --- [Firebase DB 연동 (일지 저장 및 불러오기)] ---
+  saveBtn.addEventListener('click', () => {
+    if (!currentUserInfo || !currentRoutine) return;
     
-    // 이메일 기반 자격 증명 회원가입 인터페이스
-    dom.btnSignup.addEventListener('click', async () => {
-      const email = dom.email.value.trim();
-      const password = dom.password.value;
+    const logRef = ref(db, `users/${currentUserInfo.uid}/workoutLogs`);
+    const newLogRef = push(logRef);
+    
+    const today = new Date().toLocaleDateString('ko-KR');
+    const muscle = document.getElementById('target-muscle').value;
 
-      if (!validateAuthInputs(email, password)) return;
-
-      try {
-        const credential = await createUserWithEmailAndPassword(auth, email, password);
-        alert(`선수 등록 성공: ${credential.user.email}님 환영합니다.`);
-      } catch (err) {
-        handleAuthError('회원가입 실패', err);
-      }
+    set(newLogRef, {
+      date: today,
+      target: muscle,
+      routine: currentRoutine
+    }).then(() => {
+      alert("오늘의 운동 일지가 저장되었습니다!");
     });
+  });
 
-    // 이메일 세션 인증 로그인 인터페이스
-    dom.btnLogin.addEventListener('click', async () => {
-      const email = dom.email.value.trim();
-      const password = dom.password.value;
-
-      if (!validateAuthInputs(email, password)) return;
-
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-      } catch (err) {
-        handleAuthError('로그인 실패', err);
-      }
-    });
-
-    // 세션 파기 로그아웃 인터페이스
-    dom.btnLogout.addEventListener('click', async () => {
-      if (confirm("대시보드 시스템 세션을 안전하게 종료하시겠습니까?")) {
-        await signOut(auth);
-      }
-    });
-
-    // 인증 헬퍼 함수 1: 유효성 검증
-    function validateAuthInputs(email, password) {
-      if (!email || !email.includes('@')) {
-        alert('올바른 이메일 형식을 기입하여 주십시오.');
-        return false;
-      }
-      if (!password || password.length < 6) {
-        alert('보안 비밀번호는 최소 6자리 이상 규격이어야 합니다.');
-        return false;
-      }
-      return true;
-    }
-
-    // 인증 헬퍼 함수 2: 시스템 내부 에러 분기 처리
-    function handleAuthError(context, error) {
-      console.error(`${context} 바인딩 에러 발생:`, error);
-      let localizedMsg = "네트워크 인스턴스 오버플로우 또는 구성 에러입니다.";
-      if (error.code === 'auth/email-already-in-use') localizedMsg = "이미 플랫폼에 등록된 이메일 계정입니다.";
-      if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') localizedMsg = "계정 정보가 올바르지 않습니다.";
-      if (error.code === 'auth/api-key-not-valid') localizedMsg = "Firebase 설정부의 API KEY 값이 비정상적입니다. 소스코드 165라인을 검증하십시오.";
-      alert(`${context}: ${localizedMsg}`);
-    }
-
-    // -------------------------------------------------------------
-    // 8. REAL-TIME OBSERVER FOR AUTH STATES & DATABASE COMPONENT
-    // -------------------------------------------------------------
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        // 인터페이스 뷰 토글 애니메이션 트리거 효과 대체
-        dom.loginContainer.style.display = 'none';
-        dom.dashboardContainer.style.display = 'block';
-        dom.userLabel.innerText = user.email;
-
-        // 차트 컴포넌트 목업 및 그라데이션 라인 로드
-        renderPerformanceChart('canvas-jump', '#42a5f5', [240, 250, 258, parseInt(dom.jump.value)]);
-        renderPerformanceChart('canvas-run', '#ff9800', [11.90, 11.75, 11.45, parseFloat(dom.run.value)]);
-        renderPerformanceChart('canvas-power', '#4caf50', [120, 131, 138, parseInt(dom.power.value)]);
-        renderPerformanceChart('canvas-situp', '#9c27b0', [48, 52, 54, parseInt(dom.situp.value)]);
-
-        // Firestore 서버측 데이터 조회 및 동기화 기믹
-        try {
-          const docRef = doc(db, "checo_premium_data", user.uid);
-          const snap = await getDoc(docRef);
-
-          if (snap.exists()) {
-            const data = snap.data();
-            dom.korean.value = data.academic?.korean || 85;
-            dom.english.value = data.academic?.english || 2;
-            dom.society.value = data.academic?.society || 88;
-            dom.jump.value = data.metrics?.jump || 265;
-            dom.run.value = data.metrics?.run || 11.20;
-            dom.power.value = data.metrics?.power || 145;
-            dom.situp.value = data.metrics?.situp || 58;
-            
-            if (data.persistedAiReport) dom.aiOutput.innerText = data.persistedAiReport;
-            if (data.persistedUnivHtml) dom.collegeWrapper.innerHTML = data.persistedUnivHtml;
-
-            // 로드 데이터 기반 차트 리프레시 재실행
-            refreshCharts();
-          }
-        } catch (err) {
-          console.error("Firestore 복원 실패:", err);
-        }
+  function loadWorkoutLogs(uid) {
+    const logRef = ref(db, `users/${uid}/workoutLogs`);
+    onValue(logRef, (snapshot) => {
+      logList.innerHTML = ''; // 초기화
+      const data = snapshot.val();
+      if (data) {
+        // 객체를 배열로 변환 후 최신순으로 정렬 (간단 구현)
+        const logs = Object.values(data).reverse();
+        logs.forEach(log => {
+          const li = document.createElement('li');
+          li.className = 'log-item';
+          li.innerHTML = `<strong>📅 ${log.date} | 목표: ${log.target}</strong><br><span style="font-size:0.9em; color:#555;">${log.routine.substring(0, 50)}...</span>`;
+          logList.appendChild(li);
+        });
       } else {
-        dom.loginContainer.style.display = 'block';
-        dom.dashboardContainer.style.display = 'none';
-        clearFormInputs();
+        logList.innerHTML = '<li>아직 저장된 일지가 없습니다. 오늘 첫 운동을 시작해보세요!</li>';
       }
     });
-
-    function clearFormInputs() {
-      dom.email.value = "";
-      dom.password.value = "";
-    }
-
-    function refreshCharts() {
-      renderPerformanceChart('canvas-jump
+  }
+</script>
+</body>
+</html>
