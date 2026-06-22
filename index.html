@@ -66,26 +66,31 @@
 </div>
 
 <script type="module">
+  // Firebase SDK 모듈 불러오기 (Analytics 포함)
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
   import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
   import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-  // 🔴 1. Firebase 설정 (본인의 Firebase 프로젝트 설정값으로 변경하세요)
+  // 🛠️ 보내주신 실제 batbo 프로젝트 설정값으로 완벽히 교체했습니다!
   const firebaseConfig = {
-    apiKey: "https://batbo-f2f68-default-rtdb.firebaseio.com/",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyDR2KhJEnICowvVnk2_aRbFBrlAYQjl_AQ",
+    authDomain: "batbo-f2f68.firebaseapp.com",
+    databaseURL: "https://batbo-f2f68-default-rtdb.firebaseio.com",
+    projectId: "batbo-f2f68",
+    storageBucket: "batbo-f2f68.firebasestorage.app",
+    messagingSenderId: "58905778365",
+    appId: "1:58905778365:web:c3394c57a1b8aeec837fd4",
+    measurementId: "G-XRGWG0CHRZ"
   };
 
+  // Firebase 및 Analytics 초기화
   const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
   const auth = getAuth(app);
   const db = getDatabase(app);
 
-  // 🔴 2. Google Apps Script Web App URL (본인의 배포 URL로 변경하세요)
+  // 구글 앱스 스크립트 URL 유지
   const GAS_WEB_APP_URL = "https://script.google.com/a/macros/daehyun.hs.kr/s/AKfycbz3Eh7PO9NBUloUFbx7JCVIBYLgsJ6tl48i6-1TTaSaZDXqnAfo5v09HP9k0ESYet8/exec"; 
 
   // UI 요소 가져오기
@@ -141,7 +146,7 @@
     signOut(auth);
   });
 
-  // --- [AI 생성 기능 (Apps Script 호출)] ---
+  // --- [AI 생성 기능] ---
   generateBtn.addEventListener('click', async () => {
     const muscle = document.getElementById('target-muscle').value;
     const time = document.getElementById('time-limit').value;
@@ -149,7 +154,7 @@
 
     loading.classList.remove('hidden');
     resultSection.classList.add('hidden');
-    audioContainer.innerHTML = ''; // 기존 오디오 초기화
+    audioContainer.innerHTML = ''; 
 
     try {
       const response = await fetch(GAS_WEB_APP_URL, {
@@ -182,7 +187,6 @@
       });
       const data = await response.json();
       
-      // base64 오디오 데이터를 audio 태그로 변환
       const audioTag = `<audio controls autoplay src="data:audio/mp3;base64,${data.audioBase64}"></audio>`;
       audioContainer.innerHTML = audioTag;
       
@@ -194,7 +198,7 @@
     }
   });
 
-  // --- [Firebase DB 연동 (일지 저장 및 불러오기)] ---
+  // --- [Firebase DB 연동] ---
   saveBtn.addEventListener('click', () => {
     if (!currentUserInfo || !currentRoutine) return;
     
@@ -216,10 +220,9 @@
   function loadWorkoutLogs(uid) {
     const logRef = ref(db, `users/${uid}/workoutLogs`);
     onValue(logRef, (snapshot) => {
-      logList.innerHTML = ''; // 초기화
+      logList.innerHTML = ''; 
       const data = snapshot.val();
       if (data) {
-        // 객체를 배열로 변환 후 최신순으로 정렬 (간단 구현)
         const logs = Object.values(data).reverse();
         logs.forEach(log => {
           const li = document.createElement('li');
