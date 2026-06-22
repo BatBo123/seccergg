@@ -66,13 +66,12 @@
 </div>
 
 <script type="module">
-  // Firebase SDK 모듈 불러오기 (Analytics 포함)
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
   import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
   import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-  // 🛠️ 보내주신 실제 batbo 프로젝트 설정값으로 완벽히 교체했습니다!
+  // 🛠️ 사용자의 실제 Firebase 프로젝트(batbo-f2f68) 정보 적용
   const firebaseConfig = {
     apiKey: "AIzaSyDR2KhJEnICowvVnk2_aRbFBrlAYQjl_AQ",
     authDomain: "batbo-f2f68.firebaseapp.com",
@@ -84,14 +83,13 @@
     measurementId: "G-XRGWG0CHRZ"
   };
 
-  // Firebase 및 Analytics 초기화
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
   const auth = getAuth(app);
   const db = getDatabase(app);
 
-  // 구글 앱스 스크립트 URL 유지
-  const GAS_WEB_APP_URL = "https://script.google.com/a/macros/daehyun.hs.kr/s/AKfycbz3Eh7PO9NBUloUFbx7JCVIBYLgsJ6tl48i6-1TTaSaZDXqnAfo5v09HP9k0ESYet8/exec"; 
+  // 🛠️ 요청하신 구글 앱스 스크립트 새 URL 적용 완료
+  const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwmATAH6IUhByWndfG34O_UwGFm9pdzJrbtOyHNVAAdb5s-IcoGtGwGwR4J_-Doa5E/exec"; 
 
   // UI 요소 가져오기
   const authSection = document.getElementById('auth-section');
